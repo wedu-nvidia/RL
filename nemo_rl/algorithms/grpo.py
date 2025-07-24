@@ -706,7 +706,11 @@ def grpo_train(
 
             should_save_by_step = (is_last_step or (step + 1) % master_config["checkpointing"]["save_period"] == 0)
             # +1 because step is 0-indexed
-            should_save_by_timeout = timeout.check_save()
+            # Check if timeout-based checkpointing is enabled in config.
+            # If so, use TimeoutChecker to determine whether we should save due to timeout.Otherwise, default to False (no timeout-based saving).
+            if 'timeout' in master_config: should_save_by_timeout = timeout.check_save()
+            else: should_save_by_timeout = False
+                
             
             if master_config["checkpointing"]["enabled"] and (should_save_by_step or should_save_by_timeout):  
                 policy.prepare_for_training()
