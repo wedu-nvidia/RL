@@ -247,11 +247,6 @@ class Timer:
             self._start_times = {}
 
 
-
-
-
-
-
 def convert_to_seconds(time_string):
     # Split the string into components
     days, hours, minutes, seconds = map(int, time_string.split(':'))
