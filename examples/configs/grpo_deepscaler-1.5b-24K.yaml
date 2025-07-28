@@ -46,3 +46,6 @@ policy:
       # For most cases, use "dummy" to load the initial weights, since they will be overwritten during refit
       # For Gemma models, we need to use "auto" due to a vllm bug
       load_format: dummy
+
+
+checkpoint_must_save_by: null

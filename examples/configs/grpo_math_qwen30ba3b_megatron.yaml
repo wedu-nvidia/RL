@@ -75,3 +75,6 @@ policy:
 cluster:
   gpus_per_node: 8
   num_nodes: 8
+
+
+checkpoint_must_save_by: null
