@@ -16,7 +16,7 @@ from contextlib import contextmanager
 from typing import Callable, Generator, Optional, Sequence, Union
 import sys
 import numpy as np
-
+from typing import Optional
 
 class Timer:
     """A utility for timing code execution.
@@ -247,25 +247,38 @@ class Timer:
             self._start_times = {}
 
 
-def convert_to_seconds(time_string):
-    # Split the string into components
+def convert_to_seconds(time_string: str) -> int:
+    """
+    Converts a time string in the format 'DD:HH:MM:SS' to total seconds.
+
+    Args:
+        time_string (str): Time duration string, e.g., '00:03:45:00'.
+
+    Returns:
+        int: Total time in seconds.
+    """
     days, hours, minutes, seconds = map(int, time_string.split(':'))
+    return days * 86400 + hours * 3600 + minutes * 60 + seconds
 
-    # Calculate total seconds
-    total_seconds = days * 86400 + hours * 3600 + minutes * 60 + seconds
-
-    return total_seconds
 
 
 class TimeoutChecker:
-    def __init__(self, timeout: str = '00:03:45:00', fit_last_save_time=False):
+    def __init__(self, timeout: Optional[str] = '00:03:45:00', fit_last_save_time: bool = False):
+        """
+        Initializes the TimeoutChecker.
+
+        Args:
+            timeout (str or None): Timeout in format 'DD:HH:MM:SS'. If None, timeout is considered infinite.
+            fit_last_save_time (bool): If True, considers average iteration time when checking timeout.
+        """
         super().__init__()
-        self.last_save_time = convert_to_seconds(timeout)
+        self.last_save_time = float('inf') if timeout is None else convert_to_seconds(timeout)
         self.start_time = time.time()
         self.last_saved = False
         self.iteration_times = []
         self.previous_iteration_time = None
         self.fit_last_save_time = fit_last_save_time
+
 
     def check_save(self):
         # Flush

@@ -114,6 +114,8 @@ class MasterConfig(TypedDict):
     logger: GRPOLoggerConfig
     cluster: ClusterConfig
     checkpointing: CheckpointingConfig
+    checkpoint_must_save_by: NotRequired[str]
+
 
 
 # ===============================================================================
@@ -479,7 +481,7 @@ def grpo_train(
     """Run GRPO training algorithm."""
     timer = Timer()
     timeout = TimeoutChecker(
-            timeout=master_config.get('timeout', '00:03:45:00'), # three hours and 45 minutes
+            timeout=master_config['checkpoint_must_save_by'], 
             fit_last_save_time=True,
     )
     timeout.start_iterations()
@@ -709,11 +711,8 @@ def grpo_train(
             should_save_by_step = (is_last_step or (step + 1) % master_config["checkpointing"]["save_period"] == 0)
             # +1 because step is 0-indexed
             # Check if timeout-based checkpointing is enabled in config.
-            # If so, use TimeoutChecker to determine whether we should save due to timeout.Otherwise, default to False (no timeout-based saving).
-            if 'timeout' in master_config: should_save_by_timeout = timeout.check_save()
-            else: should_save_by_timeout = False
+            should_save_by_timeout = timeout.check_save()
                 
-            
             if master_config["checkpointing"]["enabled"] and (should_save_by_step or should_save_by_timeout):  
                 policy.prepare_for_training()
 

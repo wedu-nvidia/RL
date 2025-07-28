@@ -12,3 +12,6 @@ policy:
 
   dynamic_batching:
     enabled: False
+
+
+checkpoint_must_save_by: null
