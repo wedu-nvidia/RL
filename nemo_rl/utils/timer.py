@@ -292,7 +292,7 @@ class TimeoutChecker:
         current_time = time.time()
         elapsed_time = current_time - self.start_time
 
-        if self.fit_last_save_time:
+        if self.fit_last_save_time and self.iteration_times:
             average_iteration_time = sum(self.iteration_times) / len(self.iteration_times)
             if elapsed_time + average_iteration_time >= self.last_save_time:
                 self.last_saved = True

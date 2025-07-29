@@ -48,4 +48,3 @@ policy:
       load_format: dummy
 
 
-checkpoint_must_save_by: null

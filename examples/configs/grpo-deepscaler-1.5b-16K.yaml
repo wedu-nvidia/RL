@@ -14,4 +14,3 @@ policy:
     enabled: False
 
 
-checkpoint_must_save_by: null

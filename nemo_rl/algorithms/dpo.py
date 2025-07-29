@@ -85,7 +85,7 @@ class MasterConfig(TypedDict):
     logger: LoggerConfig
     cluster: ClusterConfig
     checkpointing: CheckpointingConfig
-    checkpoint_must_save_by: NotRequired[str]
+
 
 
 # =======================================================
@@ -356,7 +356,7 @@ def dpo_train(
     # Run dpo training
     timer = Timer()
     timeout = TimeoutChecker(
-            timeout=master_config['checkpoint_must_save_by'], 
+            timeout=master_config["checkpointing"]['checkpoint_must_save_by'], 
             fit_last_save_time=True,
     )
     timeout.start_iterations()

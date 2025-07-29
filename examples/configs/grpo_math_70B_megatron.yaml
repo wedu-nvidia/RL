@@ -70,4 +70,3 @@ cluster:
   num_nodes: 8
 
 
-checkpoint_must_save_by: null

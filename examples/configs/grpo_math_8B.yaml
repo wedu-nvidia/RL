@@ -64,4 +64,3 @@ cluster:
   num_nodes: 1
 
 
-checkpoint_must_save_by: null
