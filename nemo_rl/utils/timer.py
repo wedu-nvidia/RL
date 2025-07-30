@@ -11,12 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
 import time
 from contextlib import contextmanager
 from typing import Callable, Generator, Optional, Sequence, Union
-import sys
+
 import numpy as np
-from typing import Optional
+
 
 class Timer:
     """A utility for timing code execution.
@@ -248,8 +249,7 @@ class Timer:
 
 
 def convert_to_seconds(time_string: str) -> int:
-    """
-    Converts a time string in the format 'DD:HH:MM:SS' to total seconds.
+    """Converts a time string in the format 'DD:HH:MM:SS' to total seconds.
 
     Args:
         time_string (str): Time duration string, e.g., '00:03:45:00'.
@@ -257,28 +257,29 @@ def convert_to_seconds(time_string: str) -> int:
     Returns:
         int: Total time in seconds.
     """
-    days, hours, minutes, seconds = map(int, time_string.split(':'))
+    days, hours, minutes, seconds = map(int, time_string.split(":"))
     return days * 86400 + hours * 3600 + minutes * 60 + seconds
 
 
-
 class TimeoutChecker:
-    def __init__(self, timeout: Optional[str] = '00:03:45:00', fit_last_save_time: bool = False):
-        """
-        Initializes the TimeoutChecker.
+    def __init__(
+        self, timeout: Optional[str] = "00:03:45:00", fit_last_save_time: bool = False
+    ):
+        """Initializes the TimeoutChecker.
 
         Args:
             timeout (str or None): Timeout in format 'DD:HH:MM:SS'. If None, timeout is considered infinite.
             fit_last_save_time (bool): If True, considers average iteration time when checking timeout.
         """
         super().__init__()
-        self.last_save_time = float('inf') if timeout is None else convert_to_seconds(timeout)
+        self.last_save_time = (
+            float("inf") if timeout is None else convert_to_seconds(timeout)
+        )
         self.start_time = time.time()
         self.last_saved = False
         self.iteration_times = []
         self.previous_iteration_time = None
         self.fit_last_save_time = fit_last_save_time
-
 
     def check_save(self):
         # Flush
@@ -293,7 +294,9 @@ class TimeoutChecker:
         elapsed_time = current_time - self.start_time
 
         if self.fit_last_save_time and self.iteration_times:
-            average_iteration_time = sum(self.iteration_times) / len(self.iteration_times)
+            average_iteration_time = sum(self.iteration_times) / len(
+                self.iteration_times
+            )
             if elapsed_time + average_iteration_time >= self.last_save_time:
                 self.last_saved = True
                 return True
