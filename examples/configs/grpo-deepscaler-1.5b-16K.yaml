@@ -12,5 +12,3 @@ policy:
 
   dynamic_batching:
     enabled: False
-
-
