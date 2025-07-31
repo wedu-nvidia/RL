@@ -278,7 +278,7 @@ class TimeoutChecker:
         self.start_time = time.time()
         self.last_saved = False
         self.iteration_times = []
-        self.previous_iteration_time = None
+        self.previous_iteration_time: Optional[float] = None
         self.fit_last_save_time = fit_last_save_time
 
     def check_save(self):
@@ -315,6 +315,7 @@ class TimeoutChecker:
         sys.stderr.flush()
 
         current_time = time.time()
-        elapsed_time = current_time - self.previous_iteration_time
-        self.previous_iteration_time = current_time
+        if self.previous_iteration_time is not None:
+            elapsed_time = current_time - self.previous_iteration_time
+            self.previous_iteration_time = current_time
         self.iteration_times.append(elapsed_time)
