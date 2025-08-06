@@ -29,7 +29,7 @@ from nemo_rl.algorithms.loss_functions import (
     ClippedPGLossDataDict,
     ClippedPGLossFn,
 )
-from nemo_rl.algorithms.utils import calculate_baseline_and_std_per_prompt
+from nemo_rl.algorithms.utils import calculate_baseline_and_std_per_prompt, set_seed
 from nemo_rl.data import DataConfig
 from nemo_rl.data.datasets import AllTaskProcessedDataset, rl_collate_fn
 from nemo_rl.data.interfaces import (
@@ -84,6 +84,7 @@ class GRPOConfig(TypedDict):
     val_batch_size: int
     val_at_start: bool
     max_val_samples: int
+    seed: int
 
 
 class GRPOSaveState(TypedDict):
@@ -149,12 +150,16 @@ def setup(
     generation_config = master_config["policy"]["generation"]
     loss_config = master_config["loss_fn"]
     grpo_config = master_config["grpo"]
+    data_config = master_config["data"]
     logger_config = master_config["logger"]
     cluster_config = master_config["cluster"]
 
     assert generation_config is not None, (
         "A generation config in the PolicyConfig is required for GRPO"
     )
+
+    # Set seed for all random number generators
+    set_seed(grpo_config["seed"])
 
     # ==========================
     #         Logger
@@ -179,7 +184,7 @@ def setup(
     dataloader = StatefulDataLoader(
         dataset,
         batch_size=grpo_config["num_prompts_per_step"],
-        shuffle=False,
+        shuffle=data_config["shuffle"],
         collate_fn=rl_collate_fn,
         drop_last=True,
     )
@@ -821,6 +826,20 @@ def grpo_train(
         print(
             f"  • Mean Generation Length: {rollout_metrics['mean_gen_tokens_per_sample']:.4f}"
         )
+        if "total_flops" in train_results:
+            total_tflops = (
+                train_results["total_flops"] / timing_metrics["policy_training"] / 1e12
+            )
+            num_ranks = train_results["num_ranks"]
+            print(
+                f"  • Training FLOPS: {total_tflops:.2f} TFLOPS ({total_tflops / num_ranks:.2f} TFLOPS per rank)"
+            )
+            if "theoretical_tflops" in train_results:
+                theoretical_tflops = train_results["theoretical_tflops"]
+                print(
+                    f"  • Training Model Floating Point Utilization: {100 * total_tflops / theoretical_tflops:.2f}%"
+                )
+                metrics["train_fp_utilization"] = total_tflops / theoretical_tflops
 
         print("\n⏱️  Timing:")
         # Display total time first, separately
