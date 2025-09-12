@@ -102,6 +102,7 @@ def mock_components():
         "checkpointing": {
             "enabled": False,
             "checkpoint_must_save_by": None,
+            "save_period": 10,
         },
     }
 
